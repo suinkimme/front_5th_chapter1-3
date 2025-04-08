@@ -1,6 +1,4 @@
-const isObject = (obj: unknown): obj is Record<string, unknown> => {
-  return obj !== null && typeof obj === "object";
-};
+import { isObject } from "../../validators";
 
 export function shallowEquals<T>(objA: T, objB: T): boolean {
   if (objA === objB) {
