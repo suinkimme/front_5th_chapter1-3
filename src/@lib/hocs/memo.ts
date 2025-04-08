@@ -3,7 +3,7 @@ import { shallowEquals } from "../equalities";
 
 export function memo<P extends object>(
   Component: ComponentType<P>,
-  _equals = shallowEquals
+  _equals = shallowEquals,
 ) {
   let prevProps: P | null = null;
   let prevResult: JSX.Element;
