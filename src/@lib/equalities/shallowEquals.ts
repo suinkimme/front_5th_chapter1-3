@@ -12,7 +12,7 @@ export function shallowEquals<T>(objA: T, objB: T): boolean {
       return false;
     }
 
-    return objA.every((value, index) => value === objB[index]);
+    return objA.every((value, key) => value === objB[key]);
   }
 
   if (isObject(objA) && isObject(objB)) {
