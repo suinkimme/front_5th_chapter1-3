@@ -28,7 +28,7 @@ import { useRef } from "../hooks";
  */
 export function memo<P extends object>(
   Component: ComponentType<P>,
-  _equals = shallowEquals
+  _equals = shallowEquals,
 ) {
   return function MemoizedComponent(nextProps: P) {
     const prevPropsRef = useRef<P>(null);

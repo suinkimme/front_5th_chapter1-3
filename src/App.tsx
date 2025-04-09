@@ -73,15 +73,15 @@ const useAuthContext = () => {
 };
 
 // Header 컴포넌트
-export const Header: React.FC = () => {
+export const Header: React.FC = memo(() => {
   renderLog("Header rendered");
   const { theme, toggleTheme } = useThemeContext();
   const { user, login, logout } = useAuthContext();
 
-  const handleLogin = useCallback(() => {
+  const handleLogin = () => {
     // 실제 애플리케이션에서는 사용자 입력을 받아야 합니다.
     login("user@example.com", "password");
-  }, [login]);
+  };
 
   return (
     <header className="bg-gray-800 text-white p-4">
@@ -116,7 +116,7 @@ export const Header: React.FC = () => {
       </div>
     </header>
   );
-};
+});
 
 // ItemList 컴포넌트
 export const ItemList: React.FC<{
@@ -308,7 +308,7 @@ export const NotificationSystem: React.FC = memo(() => {
 // 메인 App 컴포넌트
 const App: React.FC = () => {
   const [theme, setTheme] = useState("light");
-  const [items, setItems] = useState(generateItems(1000));
+  const [items, setItems] = useState(() => generateItems(1000));
   const [user, setUser] = useState<User | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
@@ -380,11 +380,11 @@ const App: React.FC = () => {
   return (
     <ThemeContext.Provider value={themeContextValue}>
       <AuthContext.Provider value={authContextValue}>
-        <NotificationContext.Provider value={notificationContextValue}>
-          <div
-            className={`min-h-screen ${theme === "light" ? "bg-gray-100" : "bg-gray-900 text-white"}`}
-          >
-            <Header />
+        <div
+          className={`min-h-screen ${theme === "light" ? "bg-gray-100" : "bg-gray-900 text-white"}`}
+        >
+          <Header />
+          <NotificationContext.Provider value={notificationContextValue}>
             <div className="container mx-auto px-4 py-8">
               <div className="flex flex-col md:flex-row">
                 <div className="w-full md:w-1/2 md:pr-4">
@@ -396,8 +396,8 @@ const App: React.FC = () => {
               </div>
             </div>
             <NotificationSystem />
-          </div>
-        </NotificationContext.Provider>
+          </NotificationContext.Provider>
+        </div>
       </AuthContext.Provider>
     </ThemeContext.Provider>
   );
