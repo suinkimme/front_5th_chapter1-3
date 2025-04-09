@@ -1,6 +1,7 @@
 import React, { useState, createContext, useContext } from "react";
 import { generateItems, renderLog } from "./utils";
-import { useCallback } from "./@lib/hooks";
+import { memo } from "./@lib/hocs";
+import { useMemo, useCallback } from "./@lib/hooks";
 
 // 타입 정의
 interface Item {
@@ -77,10 +78,10 @@ export const Header: React.FC = () => {
   const { theme, toggleTheme } = useThemeContext();
   const { user, login, logout } = useAuthContext();
 
-  const handleLogin = () => {
+  const handleLogin = useCallback(() => {
     // 실제 애플리케이션에서는 사용자 입력을 받아야 합니다.
     login("user@example.com", "password");
-  };
+  }, [login]);
 
   return (
     <header className="bg-gray-800 text-white p-4">
@@ -121,20 +122,30 @@ export const Header: React.FC = () => {
 export const ItemList: React.FC<{
   items: Item[];
   onAddItemsClick: () => void;
-}> = ({ items, onAddItemsClick }) => {
+}> = memo(({ items, onAddItemsClick }) => {
   renderLog("ItemList rendered");
   const [filter, setFilter] = useState("");
   const { theme } = useThemeContext();
 
-  const filteredItems = items.filter(
-    (item) =>
-      item.name.toLowerCase().includes(filter.toLowerCase()) ||
-      item.category.toLowerCase().includes(filter.toLowerCase())
+  const filteredItems = useMemo(
+    () =>
+      items.filter(
+        (item) =>
+          item.name.toLowerCase().includes(filter.toLowerCase()) ||
+          item.category.toLowerCase().includes(filter.toLowerCase())
+      ),
+    []
   );
 
-  const totalPrice = filteredItems.reduce((sum, item) => sum + item.price, 0);
+  const totalPrice = useMemo(
+    () => filteredItems.reduce((sum, item) => sum + item.price, 0),
+    []
+  );
 
-  const averagePrice = Math.round(totalPrice / filteredItems.length) || 0;
+  const averagePrice = useMemo(
+    () => Math.round(totalPrice / filteredItems.length) || 0,
+    []
+  );
 
   return (
     <div className="mt-8">
@@ -174,10 +185,10 @@ export const ItemList: React.FC<{
       </ul>
     </div>
   );
-};
+});
 
 // ComplexForm 컴포넌트
-export const ComplexForm: React.FC = () => {
+export const ComplexForm: React.FC = memo(() => {
   renderLog("ComplexForm rendered");
   const { addNotification } = useNotificationContext();
   const [formData, setFormData] = useState({
@@ -259,10 +270,10 @@ export const ComplexForm: React.FC = () => {
       </form>
     </div>
   );
-};
+});
 
 // NotificationSystem 컴포넌트
-export const NotificationSystem: React.FC = () => {
+export const NotificationSystem: React.FC = memo(() => {
   renderLog("NotificationSystem rendered");
   const { notifications, removeNotification } = useNotificationContext();
 
@@ -292,7 +303,7 @@ export const NotificationSystem: React.FC = () => {
       ))}
     </div>
   );
-};
+});
 
 // 메인 App 컴포넌트
 const App: React.FC = () => {
@@ -301,9 +312,9 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
-  };
+  }, []);
 
   const addItems = useCallback(() => {
     setItems((prevItems) => [
@@ -312,47 +323,59 @@ const App: React.FC = () => {
     ]);
   }, []);
 
-  const login = (email: string) => {
+  const login = useCallback((email: string) => {
     setUser({ id: 1, name: "홍길동", email });
     addNotification("성공적으로 로그인되었습니다", "success");
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     addNotification("로그아웃되었습니다", "info");
-  };
+  }, []);
 
-  const addNotification = (message: string, type: Notification["type"]) => {
-    const newNotification: Notification = {
-      id: Date.now(),
-      message,
-      type,
-    };
-    setNotifications((prev) => [...prev, newNotification]);
-  };
+  const addNotification = useCallback(
+    (message: string, type: Notification["type"]) => {
+      const newNotification: Notification = {
+        id: Date.now(),
+        message,
+        type,
+      };
+      setNotifications((prev) => [...prev, newNotification]);
+    },
+    []
+  );
 
-  const removeNotification = (id: number) => {
+  const removeNotification = useCallback((id: number) => {
     setNotifications((prev) =>
       prev.filter((notification) => notification.id !== id)
     );
-  };
+  }, []);
 
-  const themeContextValue: ThemeContextType = {
-    theme,
-    toggleTheme,
-  };
+  const themeContextValue: ThemeContextType = useMemo(
+    () => ({
+      theme,
+      toggleTheme,
+    }),
+    [theme, toggleTheme]
+  );
 
-  const authContextValue: AuthContextType = {
-    user,
-    login,
-    logout,
-  };
+  const authContextValue: AuthContextType = useMemo(
+    () => ({
+      user,
+      login,
+      logout,
+    }),
+    [user, login, logout]
+  );
 
-  const notificationContextValue: NotificationContextType = {
-    notifications,
-    addNotification,
-    removeNotification,
-  };
+  const notificationContextValue: NotificationContextType = useMemo(
+    () => ({
+      notifications,
+      addNotification,
+      removeNotification,
+    }),
+    [notifications, addNotification, removeNotification]
+  );
 
   return (
     <ThemeContext.Provider value={themeContextValue}>
