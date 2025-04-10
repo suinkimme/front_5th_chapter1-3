@@ -42,7 +42,7 @@ interface AuthContextType {
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined,
+  undefined
 );
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -132,19 +132,19 @@ export const ItemList: React.FC<{
       items.filter(
         (item) =>
           item.name.toLowerCase().includes(filter.toLowerCase()) ||
-          item.category.toLowerCase().includes(filter.toLowerCase()),
+          item.category.toLowerCase().includes(filter.toLowerCase())
       ),
-    [],
+    []
   );
 
   const totalPrice = useMemo(
     () => filteredItems.reduce((sum, item) => sum + item.price, 0),
-    [],
+    []
   );
 
   const averagePrice = useMemo(
     () => Math.round(totalPrice / filteredItems.length) || 0,
-    [],
+    []
   );
 
   return (
@@ -342,12 +342,12 @@ const App: React.FC = () => {
       };
       setNotifications((prev) => [...prev, newNotification]);
     },
-    [],
+    []
   );
 
   const removeNotification = useCallback((id: number) => {
     setNotifications((prev) =>
-      prev.filter((notification) => notification.id !== id),
+      prev.filter((notification) => notification.id !== id)
     );
   }, []);
 
@@ -356,7 +356,7 @@ const App: React.FC = () => {
       theme,
       toggleTheme,
     }),
-    [theme, toggleTheme],
+    [theme, toggleTheme]
   );
 
   const authContextValue: AuthContextType = useMemo(
@@ -365,7 +365,7 @@ const App: React.FC = () => {
       login,
       logout,
     }),
-    [user, login, logout],
+    [user, login, logout]
   );
 
   const notificationContextValue: NotificationContextType = useMemo(
@@ -374,7 +374,7 @@ const App: React.FC = () => {
       addNotification,
       removeNotification,
     }),
-    [notifications, addNotification, removeNotification],
+    [notifications, addNotification, removeNotification]
   );
 
   return (
